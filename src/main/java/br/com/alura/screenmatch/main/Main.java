@@ -5,7 +5,6 @@ import br.com.alura.screenmatch.model.SeriesData;
 import br.com.alura.screenmatch.service.ApiConsuption;
 import br.com.alura.screenmatch.service.DataConverter;
 
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -15,39 +14,49 @@ public class Main {
     private final String API_KEY = "&apikey=6585022c";
 
     private Scanner reader = new Scanner(System.in);
-    private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private ApiConsuption apiConsuption = new ApiConsuption();
     private DataConverter converter = new DataConverter();
 
+    private List<SeriesData> searchedSeriesList = new ArrayList<>();
+
     public void showMenu() {
-        var menu = """
-                1 - Buscar séries
-                2 - Buscar episódios
-                                
-                0 - Sair                                 
-                """;
+        var option = -1;
+        do {
+            var menu = """
+                                                 \s
+                      1 - Buscar séries
+                      2 - Buscar episódios
+                      3 - Listar séries buscadas
+                                                 \s
+                      0 - Sair                   \s
+                    """;
 
-        System.out.println(menu);
-        var option = reader.nextInt();
-        reader.nextLine();
+            System.out.println(menu);
+            option = reader.nextInt();
+            reader.nextLine();
 
-        switch (option) {
-            case 1:
-                requestSeries();
-                break;
-            case 2:
-                searchEpisodesOnSeriesBySeason();
-                break;
-            case 0:
-                System.out.println("Saindo...");
-                break;
-            default:
-                System.out.println("Opção inválida");
-        }
+            switch (option) {
+                case 1:
+                    requestSeries();
+                    break;
+                case 2:
+                    searchEpisodesOnSeriesBySeason();
+                    break;
+                case 3:
+                    listSearchedSeries();
+                    break;
+                case 0:
+                    System.out.println("Saindo...");
+                    break;
+                default:
+                    System.out.println("Opção inválida");
+            }
+        } while (option != 0);
     }
 
     private void requestSeries() {
         SeriesData data = getSeriesData();
+        searchedSeriesList.add(data);
         System.out.println(data);
     }
 
@@ -68,5 +77,9 @@ public class Main {
             seasonDataList.add(seasonData);
         }
         seasonDataList.forEach(System.out::println);
+    }
+
+    private void listSearchedSeries() {
+        searchedSeriesList.forEach(System.out::println);
     }
 }
