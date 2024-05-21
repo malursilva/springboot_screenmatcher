@@ -3,6 +3,7 @@ package br.com.alura.screenmatch.main;
 import br.com.alura.screenmatch.model.SeasonData;
 import br.com.alura.screenmatch.model.Series;
 import br.com.alura.screenmatch.model.SeriesData;
+import br.com.alura.screenmatch.repository.SeriesRepository;
 import br.com.alura.screenmatch.service.ApiConsuption;
 import br.com.alura.screenmatch.service.DataConverter;
 
@@ -18,8 +19,12 @@ public class Main {
     private Scanner reader = new Scanner(System.in);
     private ApiConsuption apiConsuption = new ApiConsuption();
     private DataConverter converter = new DataConverter();
-
+    private SeriesRepository seriesRepository;
     private List<SeriesData> searchedSeriesList = new ArrayList<>();
+
+    public Main(SeriesRepository seriesRepository) {
+        this.seriesRepository = seriesRepository;
+    }
 
     public void showMenu() {
         var option = -1;
@@ -57,9 +62,9 @@ public class Main {
     }
 
     private void requestSeries() {
-        SeriesData data = getSeriesData();
-        searchedSeriesList.add(data);
-        System.out.println(data);
+        Series series = new Series(getSeriesData());
+        seriesRepository.save(series);
+        System.out.println(series);
     }
 
     private SeriesData getSeriesData() {
@@ -82,7 +87,7 @@ public class Main {
     }
 
     private void listSearchedSeries() {
-        List<Series> series = new ArrayList<>();
+        List<Series> series;
         series = searchedSeriesList.stream()
                 .map(Series::new)
                 .toList();

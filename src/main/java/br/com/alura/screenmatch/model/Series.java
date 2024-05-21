@@ -1,15 +1,27 @@
 package br.com.alura.screenmatch.model;
 
+import jakarta.persistence.*;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.OptionalDouble;
 
+@Entity
 public class Series {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @Column(unique = true)
     private String title;
     private Integer totalSeasons;
     private Double rating;
+    @Enumerated(EnumType.STRING)
     private MediaGenre mainGenre;
     private String mainActors;
     private String synopsis;
     private String posterUrl;
+    @Transient
+    private List<Episode> episodes = new ArrayList<>();
 
     public Series(SeriesData seriesData) {
         this.title = seriesData.title();
@@ -21,42 +33,86 @@ public class Series {
         this.posterUrl = seriesData.posterUrl();
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public String getTitle() {
         return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public Integer getTotalSeasons() {
         return totalSeasons;
     }
 
+    public void setTotalSeasons(Integer totalSeasons) {
+        this.totalSeasons = totalSeasons;
+    }
+
     public Double getRating() {
         return rating;
+    }
+
+    public void setRating(Double rating) {
+        this.rating = rating;
     }
 
     public MediaGenre getMainGenre() {
         return mainGenre;
     }
 
+    public void setMainGenre(MediaGenre mainGenre) {
+        this.mainGenre = mainGenre;
+    }
+
     public String getMainActors() {
         return mainActors;
+    }
+
+    public void setMainActors(String mainActors) {
+        this.mainActors = mainActors;
     }
 
     public String getSynopsis() {
         return synopsis;
     }
 
+    public void setSynopsis(String synopsis) {
+        this.synopsis = synopsis;
+    }
+
     public String getPosterUrl() {
         return posterUrl;
     }
 
+    public void setPosterUrl(String posterUrl) {
+        this.posterUrl = posterUrl;
+    }
+
     @Override
     public String toString() {
-        return  " Genre=" + mainGenre +
+        return " Genre=" + mainGenre +
                 ", Title='" + title + '\'' +
                 ", Seasons=" + totalSeasons +
                 ", Rating=" + rating +
                 ", Actors='" + mainActors + '\'' +
                 ", Plot='" + synopsis + '\'' +
                 ", Poster='" + posterUrl + '\'';
+    }
+
+    public List<Episode> getEpisodes() {
+        return episodes;
+    }
+
+    public void setEpisodes(List<Episode> episodes) {
+        this.episodes = episodes;
     }
 }
