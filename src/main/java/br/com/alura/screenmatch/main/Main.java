@@ -1,13 +1,16 @@
 package br.com.alura.screenmatch.main;
 
 import br.com.alura.screenmatch.model.SeasonData;
+import br.com.alura.screenmatch.model.Series;
 import br.com.alura.screenmatch.model.SeriesData;
 import br.com.alura.screenmatch.service.ApiConsuption;
 import br.com.alura.screenmatch.service.DataConverter;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class Main {
     private final String ADDRESS = "https://www.omdbapi.com/?t=";
@@ -80,6 +83,12 @@ public class Main {
     }
 
     private void listSearchedSeries() {
-        searchedSeriesList.forEach(System.out::println);
+        List<Series> series = new ArrayList<>();
+        series = searchedSeriesList.stream()
+                .map(Series::new)
+                .toList();
+        series.stream()
+                .sorted(Comparator.comparing(Series::getMainGenre))
+                .forEach(System.out::println);
     }
 }
