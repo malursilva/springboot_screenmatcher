@@ -1,7 +1,7 @@
 package br.com.alura.screenmatch.model;
 
 public enum MediaGenre {
-    ACAO("Action"), AVENTURA("Adventure"), COMEDIA("Comedy"),
+    ACTION("Action"), ADVENTURE("Adventure"), COMEDY("Comedy"),
     CRIME("Crime"), DRAMA("Drama"), HORROR("Terror"),
     ROMANCE("Romance");
 
@@ -17,6 +17,6 @@ public enum MediaGenre {
                 return genre;
             }
         }
-        throw new IllegalArgumentException("Nenuma categoria encontrada para a string fornecida");
+        throw new IllegalArgumentException("Genre not found");
     }
 }

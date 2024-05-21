@@ -51,12 +51,12 @@ public class Series {
 
     @Override
     public String toString() {
-        return  " Gênero=" + mainGenre +
-                ", Título='" + title + '\'' +
-                ", Temporadas=" + totalSeasons +
-                ", Avaliação=" + rating +
-                ", Atores='" + mainActors + '\'' +
-                ", Sinopse='" + synopsis + '\'' +
+        return  " Genre=" + mainGenre +
+                ", Title='" + title + '\'' +
+                ", Seasons=" + totalSeasons +
+                ", Rating=" + rating +
+                ", Actors='" + mainActors + '\'' +
+                ", Plot='" + synopsis + '\'' +
                 ", Poster='" + posterUrl + '\'';
     }
 }

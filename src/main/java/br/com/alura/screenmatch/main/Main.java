@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
-import java.util.stream.Collectors;
 
 public class Main {
     private final String ADDRESS = "https://www.omdbapi.com/?t=";
@@ -27,11 +26,11 @@ public class Main {
         do {
             var menu = """
                                                  \s
-                      1 - Buscar séries
-                      2 - Buscar episódios
-                      3 - Listar séries buscadas
+                      1 - Search TV Series
+                      2 - Search Episodes
+                      3 - List searched Series
                                                  \s
-                      0 - Sair                   \s
+                      0 - Exit                   \s
                     """;
 
             System.out.println(menu);
@@ -49,10 +48,10 @@ public class Main {
                     listSearchedSeries();
                     break;
                 case 0:
-                    System.out.println("Saindo...");
+                    System.out.println("Exiting...");
                     break;
                 default:
-                    System.out.println("Opção inválida");
+                    System.out.println("Invalid option");
             }
         } while (option != 0);
     }
@@ -64,7 +63,7 @@ public class Main {
     }
 
     private SeriesData getSeriesData() {
-        System.out.println("Digite o nome da série para busca");
+        System.out.println("Type the TV Series name to search:");
         var seriesName = reader.nextLine();
         var json = apiConsuption.getData(ADDRESS + seriesName.replace(" ", "+") + API_KEY);
         return converter.getData(json, SeriesData.class);
