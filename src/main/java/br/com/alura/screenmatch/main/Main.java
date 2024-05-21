@@ -7,10 +7,7 @@ import br.com.alura.screenmatch.repository.SeriesRepository;
 import br.com.alura.screenmatch.service.ApiConsuption;
 import br.com.alura.screenmatch.service.DataConverter;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class Main {
     private final String ADDRESS = "https://www.omdbapi.com/?t=";
@@ -20,7 +17,6 @@ public class Main {
     private ApiConsuption apiConsuption = new ApiConsuption();
     private DataConverter converter = new DataConverter();
     private SeriesRepository seriesRepository;
-    private List<SeriesData> searchedSeriesList = new ArrayList<>();
 
     public Main(SeriesRepository seriesRepository) {
         this.seriesRepository = seriesRepository;
@@ -28,8 +24,8 @@ public class Main {
 
     public void showMenu() {
         var option = -1;
-        do {
-            var menu = """
+        var entry = "";
+        var menu = """
                                                  \s
                       1 - Search TV Series
                       2 - Search Episodes
@@ -38,9 +34,14 @@ public class Main {
                       0 - Exit                   \s
                     """;
 
+        do {
             System.out.println(menu);
-            option = reader.nextInt();
-            reader.nextLine();
+            entry = reader.nextLine();
+            try {
+                option = Integer.parseInt(entry);
+            } catch (NumberFormatException e) {
+                option = -1;
+            }
 
             switch (option) {
                 case 1:
@@ -87,10 +88,7 @@ public class Main {
     }
 
     private void listSearchedSeries() {
-        List<Series> series;
-        series = searchedSeriesList.stream()
-                .map(Series::new)
-                .toList();
+        List<Series> series = seriesRepository.findAll();
         series.stream()
                 .sorted(Comparator.comparing(Series::getMainGenre))
                 .forEach(System.out::println);
