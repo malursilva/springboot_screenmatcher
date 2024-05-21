@@ -30,12 +30,14 @@ public class Main {
         var option = -1;
         var entry = "";
         var menu = """
-                                             \s
-                  1 - Search TV Series
-                  2 - Search Episodes
-                  3 - List searched Series
-                                             \s
-                  0 - Exit                   \s
+                -------------------------------
+                |  1 - Search TV Series       |
+                |  2 - Search Episodes        |
+                |  3 - List searched Series   |
+                |  4 - List Series by name    |
+                |                             |
+                |  0 - Exit                   |
+                -------------------------------
                 """;
 
         do {
@@ -56,6 +58,9 @@ public class Main {
                     break;
                 case 3:
                     listSearchedSeries();
+                    break;
+                case 4:
+                    searchAndShowSeriesByTitle();
                     break;
                 case 0:
                     System.out.println("Exiting...");
@@ -83,9 +88,7 @@ public class Main {
         listSearchedSeries();
         System.out.println("Insert a series name from the list above: ");
         var seriesName = reader.nextLine();
-        Optional<Series> seriesData = currentSavedSeries.stream()
-                .filter(s -> s.getTitle().toLowerCase().contains(seriesName.toLowerCase()))
-                .findFirst();
+        Optional<Series> seriesData = seriesRepository.findByTitleContainingIgnoreCase(seriesName);
 
         if (seriesData.isPresent()) {
             var seriesFound = seriesData.get();
@@ -112,5 +115,17 @@ public class Main {
         currentSavedSeries.stream()
                 .sorted(Comparator.comparing(Series::getMainGenre))
                 .forEach(System.out::println);
+    }
+
+    private void searchAndShowSeriesByTitle() {
+        System.out.println("Insert a series name to search: ");
+        var seriesName = reader.nextLine();
+        Optional<Series> searchedSeries = seriesRepository.findByTitleContainingIgnoreCase(seriesName);
+
+        if (searchedSeries.isPresent()) {
+            System.out.println("Series data: " + searchedSeries.get());
+        } else {
+            System.out.println("Series not found on the database :|");
+        }
     }
 }
