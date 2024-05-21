@@ -1,5 +1,6 @@
 package br.com.alura.screenmatch.main;
 
+import br.com.alura.screenmatch.model.Episode;
 import br.com.alura.screenmatch.model.SeasonData;
 import br.com.alura.screenmatch.model.Series;
 import br.com.alura.screenmatch.model.SeriesData;
@@ -8,6 +9,7 @@ import br.com.alura.screenmatch.service.ApiConsuption;
 import br.com.alura.screenmatch.service.DataConverter;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Main {
     private final String ADDRESS = "https://www.omdbapi.com/?t=";
@@ -18,6 +20,8 @@ public class Main {
     private DataConverter converter = new DataConverter();
     private SeriesRepository seriesRepository;
 
+    private List<Series> currentSavedSeries = new ArrayList<>();
+
     public Main(SeriesRepository seriesRepository) {
         this.seriesRepository = seriesRepository;
     }
@@ -26,13 +30,13 @@ public class Main {
         var option = -1;
         var entry = "";
         var menu = """
-                                                 \s
-                      1 - Search TV Series
-                      2 - Search Episodes
-                      3 - List searched Series
-                                                 \s
-                      0 - Exit                   \s
-                    """;
+                                             \s
+                  1 - Search TV Series
+                  2 - Search Episodes
+                  3 - List searched Series
+                                             \s
+                  0 - Exit                   \s
+                """;
 
         do {
             System.out.println(menu);
@@ -76,20 +80,36 @@ public class Main {
     }
 
     private void searchEpisodesOnSeriesBySeason() {
-        SeriesData seriesData = getSeriesData();
-        List<SeasonData> seasonDataList = new ArrayList<>();
+        listSearchedSeries();
+        System.out.println("Insert a series name from the list above: ");
+        var seriesName = reader.nextLine();
+        Optional<Series> seriesData = currentSavedSeries.stream()
+                .filter(s -> s.getTitle().toLowerCase().contains(seriesName.toLowerCase()))
+                .findFirst();
 
-        for (int i = 1; i <= seriesData.totalSeasons(); i++) {
-            var json = apiConsuption.getData(ADDRESS + seriesData.title().replace(" ", "+") + "&season=" + i + API_KEY);
-            SeasonData seasonData = converter.getData(json, SeasonData.class);
-            seasonDataList.add(seasonData);
+        if (seriesData.isPresent()) {
+            var seriesFound = seriesData.get();
+            List<SeasonData> seasonDataList = new ArrayList<>();
+            for (int i = 1; i <= seriesFound.getTotalSeasons(); i++) {
+                var json = apiConsuption.getData(ADDRESS + seriesFound.getTitle().replace(" ", "+") + "&season=" + i + API_KEY);
+                SeasonData seasonData = converter.getData(json, SeasonData.class);
+                seasonDataList.add(seasonData);
+            }
+            seasonDataList.forEach(System.out::println);
+            List<Episode> episodes = seasonDataList.stream()
+                    .flatMap(d -> d.episodes().stream()
+                            .map(e -> new Episode(d.number(), e)))
+                    .toList();
+            seriesFound.setEpisodes(episodes);
+            seriesRepository.save(seriesFound);
+        } else {
+            System.out.println("Series not found on the database :|");
         }
-        seasonDataList.forEach(System.out::println);
     }
 
     private void listSearchedSeries() {
-        List<Series> series = seriesRepository.findAll();
-        series.stream()
+        currentSavedSeries = seriesRepository.findAll();
+        currentSavedSeries.stream()
                 .sorted(Comparator.comparing(Series::getMainGenre))
                 .forEach(System.out::println);
     }
