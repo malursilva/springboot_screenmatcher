@@ -20,10 +20,11 @@ public class Series {
     private String mainActors;
     private String synopsis;
     private String posterUrl;
-    @Transient
+    @OneToMany(mappedBy = "series")
     private List<Episode> episodes = new ArrayList<>();
 
-    public Series() { }
+    public Series() {
+    }
 
     public Series(SeriesData seriesData) {
         this.title = seriesData.title();
