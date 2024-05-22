@@ -111,8 +111,8 @@ public class Series {
 
     @Override
     public String toString() {
-        return " Genre=" + mainGenre +
-                ", Title='" + title + '\'' +
+        return  "Title='" + title + '\'' +
+                ", Genre=" + mainGenre +
                 ", Seasons=" + totalSeasons +
                 ", Rating=" + rating +
                 ", Actors='" + mainActors + '\'' +

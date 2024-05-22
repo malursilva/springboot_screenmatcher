@@ -1,15 +1,11 @@
 package br.com.alura.screenmatch.main;
 
-import br.com.alura.screenmatch.model.Episode;
-import br.com.alura.screenmatch.model.SeasonData;
-import br.com.alura.screenmatch.model.Series;
-import br.com.alura.screenmatch.model.SeriesData;
+import br.com.alura.screenmatch.model.*;
 import br.com.alura.screenmatch.repository.SeriesRepository;
 import br.com.alura.screenmatch.service.ApiConsuption;
 import br.com.alura.screenmatch.service.DataConverter;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Main {
     private final String ADDRESS = "https://www.omdbapi.com/?t=";
@@ -33,12 +29,14 @@ public class Main {
                 -------------------------------
                 |  1 - Search TV Series       |
                 |  2 - Search Episodes        |
-                |  3 - List searched Series   |
-                |  4 - List Series by name    |
+                |  3 - List stored Series     |
+                |  4 - List Series by Name    |
+                |  5 - List Series by Actor   |
+                |  6 - List Series by Genre   |
+                |  7 - List Top best rated    |
                 |                             |
                 |  0 - Exit                   |
-                -------------------------------
-                """;
+                -------------------------------""";
 
         do {
             System.out.println(menu);
@@ -60,13 +58,26 @@ public class Main {
                     listSearchedSeries();
                     break;
                 case 4:
-                    searchAndShowSeriesByTitle();
+                    searchSeriesByTitle();
+                    break;
+                case 5:
+                    searchSeriesByActor();
+                    break;
+                case 6:
+                    searchSeriesByGenre();
+                    break;
+                case 7:
+                    listTopBestRatedSeries();
                     break;
                 case 0:
                     System.out.println("Exiting...");
                     break;
                 default:
                     System.out.println("Invalid option");
+            }
+            if (option > 0) {
+                System.out.println("\nType anything to return to menu");
+                reader.nextLine();
             }
         } while (option != 0);
     }
@@ -113,11 +124,11 @@ public class Main {
     private void listSearchedSeries() {
         currentSavedSeries = seriesRepository.findAll();
         currentSavedSeries.stream()
-                .sorted(Comparator.comparing(Series::getMainGenre))
+                .sorted(Comparator.comparing(Series::getTitle))
                 .forEach(System.out::println);
     }
 
-    private void searchAndShowSeriesByTitle() {
+    private void searchSeriesByTitle() {
         System.out.println("Insert a series name to search: ");
         var seriesName = reader.nextLine();
         Optional<Series> searchedSeries = seriesRepository.findByTitleContainingIgnoreCase(seriesName);
@@ -127,5 +138,24 @@ public class Main {
         } else {
             System.out.println("Series not found on the database :|");
         }
+    }
+
+    private void searchSeriesByActor() {
+        System.out.println("Insert the actor/actress name: ");
+        var name = reader.nextLine();
+        List<Series> searchedSeries = seriesRepository.findByMainActorsContainingIgnoreCase(name);
+        searchedSeries.forEach(s -> System.out.println("Title: " + s.getTitle() + " | Main Cast: " + s.getMainActors()));
+    }
+
+    private void searchSeriesByGenre() {
+        System.out.println("Insert a series genre to search: ");
+        var genre = reader.nextLine();
+        List<Series> searchedSeries = seriesRepository.findByMainGenre(MediaGenre.fromString(genre));
+        searchedSeries.forEach(System.out::println);
+    }
+
+    private void listTopBestRatedSeries() {
+        List<Series> topSeries = seriesRepository.findTop5ByOrderByRatingDesc();
+        topSeries.forEach(s -> System.out.println(s.getTitle() + " - " + s.getRating()));
     }
 }
