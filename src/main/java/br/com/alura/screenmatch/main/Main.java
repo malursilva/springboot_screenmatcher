@@ -80,10 +80,15 @@ public class Main {
                     System.out.println("Invalid option");
             }
             if (option > 0) {
-                System.out.println("\nType anything to return to menu");
+                System.out.println("\n----------------------------------\n Type anything to return to menu");
                 reader.nextLine();
             }
         } while (option != 0);
+    }
+
+    private String readStringValue(String message) {
+        System.out.println(message);
+        return reader.nextLine();
     }
 
     private void requestSeries() {
@@ -93,16 +98,14 @@ public class Main {
     }
 
     private SeriesData getSeriesData() {
-        System.out.println("Type the TV Series name to search:");
-        var seriesName = reader.nextLine();
+        var seriesName = readStringValue("Type the TV Series name to search:");
         var json = apiConsuption.getData(ADDRESS + seriesName.replace(" ", "+") + API_KEY);
         return converter.getData(json, SeriesData.class);
     }
 
     private void searchEpisodesOnSeriesBySeason() {
         listSearchedSeries();
-        System.out.println("Insert a series name from the list above: ");
-        var seriesName = reader.nextLine();
+        var seriesName = readStringValue("Insert a series name from the list above:");
         Optional<Series> seriesData = seriesRepository.findByTitleContainingIgnoreCase(seriesName);
 
         if (seriesData.isPresent()) {
@@ -133,8 +136,7 @@ public class Main {
     }
 
     private void searchSeriesByTitle() {
-        System.out.println("Insert a series name to search: ");
-        var seriesName = reader.nextLine();
+        var seriesName = readStringValue("Insert a series name to search: ");
         Optional<Series> searchedSeries = seriesRepository.findByTitleContainingIgnoreCase(seriesName);
 
         if (searchedSeries.isPresent()) {
@@ -145,15 +147,13 @@ public class Main {
     }
 
     private void searchSeriesByActor() {
-        System.out.println("Insert the actor/actress name: ");
-        var name = reader.nextLine();
+        var name = readStringValue("Insert the actor/actress name:");
         List<Series> searchedSeries = seriesRepository.findByMainActorsContainingIgnoreCase(name);
         searchedSeries.forEach(s -> System.out.println("Title: " + s.getTitle() + " | Main Cast: " + s.getMainActors()));
     }
 
     private void searchSeriesByGenre() {
-        System.out.println("Insert a series genre to search: ");
-        var genre = reader.nextLine();
+        var genre = readStringValue("Insert a series genre to search:");
         List<Series> searchedSeries = seriesRepository.findByMainGenre(MediaGenre.fromString(genre));
         searchedSeries.forEach(System.out::println);
     }
@@ -164,12 +164,8 @@ public class Main {
     }
 
     private void filterSeriesBySeasonAndRating() {
-        System.out.println("Insert the max number of seasons the series should have:");
-        var maxSeasons = reader.nextInt();
-        reader.nextLine();
-        System.out.println("Insert the minimum rating the show should have:");
-        var minRating = reader.nextDouble();
-        reader.nextLine();
+        var maxSeasons = Integer.parseInt(readStringValue("Insert the max number of seasons the series should have:"));
+        var minRating = Double.parseDouble(readStringValue("Insert the minimum rating the show should have:"));
         List<Series> searchedSeries = seriesRepository.seriesBySeasonAmountAndRating(maxSeasons, minRating);
         searchedSeries.forEach(s -> System.out.println(s.getTitle() + " | seasons: " + s.getTotalSeasons() + " | rating: " + s.getRating()));
     }
