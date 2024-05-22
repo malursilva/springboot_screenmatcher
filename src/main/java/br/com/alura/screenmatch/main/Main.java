@@ -35,6 +35,7 @@ public class Main {
                 |  6 - List Series by Genre     |
                 |  7 - List Top best rated      |
                 |  8 - Filter by season/rating  |
+                |  9 - Search episode by name   |
                 |                               |
                 |  0 - Exit                     |
                 ---------------------------------""";
@@ -73,6 +74,9 @@ public class Main {
                 case 8:
                     filterSeriesBySeasonAndRating();
                     break;
+                case 9:
+                    searchEpisodeByNameInsert();
+                    break;
                 case 0:
                     System.out.println("Exiting...");
                     break;
@@ -105,7 +109,7 @@ public class Main {
 
     private void searchEpisodesOnSeriesBySeason() {
         listSearchedSeries();
-        var seriesName = readStringValue("Insert a series name from the list above:");
+        var seriesName = readStringValue("\nInsert a series name from the list above:");
         Optional<Series> seriesData = seriesRepository.findByTitleContainingIgnoreCase(seriesName);
 
         if (seriesData.isPresent()) {
@@ -168,5 +172,14 @@ public class Main {
         var minRating = Double.parseDouble(readStringValue("Insert the minimum rating the show should have:"));
         List<Series> searchedSeries = seriesRepository.seriesBySeasonAmountAndRating(maxSeasons, minRating);
         searchedSeries.forEach(s -> System.out.println(s.getTitle() + " | seasons: " + s.getTotalSeasons() + " | rating: " + s.getRating()));
+    }
+
+    private void searchEpisodeByNameInsert() {
+        var name = readStringValue("Insert the part of the name of the episode:");
+        List<Episode> searchedEpisodes = seriesRepository.episodesByPartialName(name);
+        searchedEpisodes.forEach(e ->
+                System.out.printf("Series: %s | Season: %s | Episode: %s - %s\n",
+                e.getSeries().getTitle(), e.getSeasonNumber(), e.getNumber(), e.getTitle())
+        );
     }
 }
