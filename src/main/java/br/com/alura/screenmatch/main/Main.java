@@ -16,7 +16,7 @@ public class Main {
     private DataConverter converter = new DataConverter();
     private SeriesRepository seriesRepository;
 
-    private List<Series> currentSavedSeries = new ArrayList<>();
+    private Optional<Series> seriesCache;
 
     public Main(SeriesRepository seriesRepository) {
         this.seriesRepository = seriesRepository;
@@ -36,6 +36,7 @@ public class Main {
                 |  7 - List Top best rated      |
                 |  8 - Filter by season/rating  |
                 |  9 - Search episode by name   |
+                | 10 - List Top best episodes   |
                 |                               |
                 |  0 - Exit                     |
                 ---------------------------------""";
@@ -76,6 +77,9 @@ public class Main {
                     break;
                 case 9:
                     searchEpisodeByNameInsert();
+                    break;
+                case 10:
+                    listTopBestRatedEpisodesBySeries();
                     break;
                 case 0:
                     System.out.println("Exiting...");
@@ -133,18 +137,18 @@ public class Main {
     }
 
     private void listSearchedSeries() {
-        currentSavedSeries = seriesRepository.findAll();
-        currentSavedSeries.stream()
+        var allSeries = seriesRepository.findAll();
+        allSeries.stream()
                 .sorted(Comparator.comparing(Series::getTitle))
                 .forEach(System.out::println);
     }
 
     private void searchSeriesByTitle() {
         var seriesName = readStringValue("Insert a series name to search: ");
-        Optional<Series> searchedSeries = seriesRepository.findByTitleContainingIgnoreCase(seriesName);
+        seriesCache = seriesRepository.findByTitleContainingIgnoreCase(seriesName);
 
-        if (searchedSeries.isPresent()) {
-            System.out.println("Series data: " + searchedSeries.get());
+        if (seriesCache.isPresent()) {
+            System.out.println("Series data: " + seriesCache.get());
         } else {
             System.out.println("Series not found on the database :|");
         }
@@ -179,7 +183,18 @@ public class Main {
         List<Episode> searchedEpisodes = seriesRepository.episodesByPartialName(name);
         searchedEpisodes.forEach(e ->
                 System.out.printf("Series: %s | Season: %s | Episode: %s - %s\n",
-                e.getSeries().getTitle(), e.getSeasonNumber(), e.getNumber(), e.getTitle())
+                        e.getSeries().getTitle(), e.getSeasonNumber(), e.getNumber(), e.getTitle())
         );
+    }
+
+    private void listTopBestRatedEpisodesBySeries() {
+        searchSeriesByTitle();
+        if (seriesCache.isPresent()) {
+            var topSize = Integer.parseInt(readStringValue("Insert the Top list size:"));
+            List<Episode> topEpisodes = seriesRepository.searchTopEpisodesBySeries(seriesCache.get(), topSize);
+            topEpisodes.forEach(e ->
+                    System.out.printf("Season: %s | Episode: %s - %s | Rating: %s\n",
+                            e.getSeasonNumber(), e.getNumber(), e.getTitle(), e.getRating()));
+        }
     }
 }
