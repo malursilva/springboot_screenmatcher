@@ -26,17 +26,18 @@ public class Main {
         var option = -1;
         var entry = "";
         var menu = """
-                -------------------------------
-                |  1 - Search TV Series       |
-                |  2 - Search Episodes        |
-                |  3 - List stored Series     |
-                |  4 - List Series by Name    |
-                |  5 - List Series by Actor   |
-                |  6 - List Series by Genre   |
-                |  7 - List Top best rated    |
-                |                             |
-                |  0 - Exit                   |
-                -------------------------------""";
+                ---------------------------------
+                |  1 - Search TV Series         |
+                |  2 - Search Episodes          |
+                |  3 - List stored Series       |
+                |  4 - List Series by Name      |
+                |  5 - List Series by Actor     |
+                |  6 - List Series by Genre     |
+                |  7 - List Top best rated      |
+                |  8 - Filter by season/rating  |
+                |                               |
+                |  0 - Exit                     |
+                ---------------------------------""";
 
         do {
             System.out.println(menu);
@@ -68,6 +69,9 @@ public class Main {
                     break;
                 case 7:
                     listTopBestRatedSeries();
+                    break;
+                case 8:
+                    filterSeriesBySeasonAndRating();
                     break;
                 case 0:
                     System.out.println("Exiting...");
@@ -157,5 +161,16 @@ public class Main {
     private void listTopBestRatedSeries() {
         List<Series> topSeries = seriesRepository.findTop5ByOrderByRatingDesc();
         topSeries.forEach(s -> System.out.println(s.getTitle() + " - " + s.getRating()));
+    }
+
+    private void filterSeriesBySeasonAndRating() {
+        System.out.println("Insert the max number of seasons the series should have:");
+        var maxSeasons = reader.nextInt();
+        reader.nextLine();
+        System.out.println("Insert the minimum rating the show should have:");
+        var minRating = reader.nextDouble();
+        reader.nextLine();
+        List<Series> searchedSeries = seriesRepository.seriesBySeasonAmountAndRating(maxSeasons, minRating);
+        searchedSeries.forEach(s -> System.out.println(s.getTitle() + " | seasons: " + s.getTotalSeasons() + " | rating: " + s.getRating()));
     }
 }
