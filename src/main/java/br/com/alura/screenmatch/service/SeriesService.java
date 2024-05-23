@@ -1,12 +1,15 @@
 package br.com.alura.screenmatch.service;
 
+import br.com.alura.screenmatch.dto.EpisodeDTO;
 import br.com.alura.screenmatch.dto.SeriesDTO;
+import br.com.alura.screenmatch.model.Episode;
 import br.com.alura.screenmatch.model.Series;
 import br.com.alura.screenmatch.repository.SeriesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class SeriesService {
@@ -30,6 +33,16 @@ public class SeriesService {
         return series.map(this::convertSeriesToDTO).orElse(null);
     }
 
+    public List<EpisodeDTO> getEpisodesFromAllSeasons(Long id) {
+        Optional<Series> series = repository.findById(id);
+
+        if(series.isPresent()) {
+            Series s = series.get();
+            return convertListEpisodes(s.getEpisodes());
+        }
+        return null;
+    }
+
     private List<SeriesDTO> convertListSeries(List<Series> seriesList) {
         return seriesList.stream().map(this::convertSeriesToDTO).toList();
     }
@@ -37,5 +50,13 @@ public class SeriesService {
     private SeriesDTO convertSeriesToDTO(Series s) {
         return new SeriesDTO(s.getId(), s.getTitle(), s.getTotalSeasons(), s.getRating(),
                 s.getMainGenre(), s.getMainActors(), s.getSynopsis(), s.getPosterUrl());
+    }
+
+    private List<EpisodeDTO> convertListEpisodes(List<Episode> episodeList) {
+        return episodeList.stream().map(this::convertEpisodeToDTO).toList();
+    }
+
+    private EpisodeDTO convertEpisodeToDTO(Episode e) {
+        return new EpisodeDTO(e.getSeasonNumber(), e.getNumber(), e.getTitle());
     }
 }
