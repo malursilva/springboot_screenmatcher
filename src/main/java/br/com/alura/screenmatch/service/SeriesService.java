@@ -22,7 +22,12 @@ public class SeriesService {
     }
 
     public List<SeriesDTO> getRecentReleases() {
-        return convertListSeries(repository.findTop5ByOrderByEpisodesReleaseDateDesc());
+        return convertListSeries(repository.searchSeriesWithRecentEpisodesReleased());
+    }
+
+    public SeriesDTO getSeriesById(Long id) {
+        var series = repository.findById(id);
+        return series.map(this::convertSeriesToDTO).orElse(null);
     }
 
     private List<SeriesDTO> convertListSeries(List<Series> seriesList) {
