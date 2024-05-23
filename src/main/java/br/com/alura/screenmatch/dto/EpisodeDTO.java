@@ -5,6 +5,7 @@ import java.time.LocalDate;
 public record EpisodeDTO(
         Integer seasonNumber,
         Integer number,
-        String title
+        String title,
+        Double rating
 ) {
 }

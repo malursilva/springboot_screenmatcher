@@ -41,16 +41,16 @@ public class SeriesService {
 
     public List<EpisodeDTO> getEpisodesFromAllSeasons(Long id) {
         Optional<Series> series = repository.findById(id);
-
-        if(series.isPresent()) {
-            Series s = series.get();
-            return convertListEpisodes(s.getEpisodes());
-        }
-        return null;
+        return series.map(value -> convertListEpisodes(value.getEpisodes())).orElse(null);
     }
 
     public List<EpisodeDTO> getEpisodesFromSeason(Long id, int number) {
         return convertListEpisodes(repository.episodesBySeriesAndSeason(id, number));
+    }
+
+    public List<EpisodeDTO> getTop5EpisodesFromSeries(Long id) {
+        Optional<Series> series = repository.findById(id);
+        return series.map(value -> convertListEpisodes(repository.searchTopEpisodesBySeries(value, 5))).orElse(null);
     }
 
     private List<SeriesDTO> convertListSeries(List<Series> seriesList) {
@@ -67,6 +67,6 @@ public class SeriesService {
     }
 
     private EpisodeDTO convertEpisodeToDTO(Episode e) {
-        return new EpisodeDTO(e.getSeasonNumber(), e.getNumber(), e.getTitle());
+        return new EpisodeDTO(e.getSeasonNumber(), e.getNumber(), e.getTitle(), e.getRating());
     }
 }
