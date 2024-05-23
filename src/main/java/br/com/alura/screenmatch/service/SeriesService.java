@@ -43,6 +43,10 @@ public class SeriesService {
         return null;
     }
 
+    public List<EpisodeDTO> getEpisodesFromSeason(Long id, int number) {
+        return convertListEpisodes(repository.episodesBySeriesAndSeason(id, number));
+    }
+
     private List<SeriesDTO> convertListSeries(List<Series> seriesList) {
         return seriesList.stream().map(this::convertSeriesToDTO).toList();
     }
