@@ -18,4 +18,13 @@ public class SeriesController {
         return service.getAllSeries();
     }
 
+    @GetMapping("/series/top5")
+    public List<SeriesDTO> getSeriesTop5() {
+        return service.getTop5Series();
+    }
+
+    @GetMapping("/series/releases")
+    public List<SeriesDTO> getRecentReleases() {
+        return service.getRecentReleases();
+    }
 }
